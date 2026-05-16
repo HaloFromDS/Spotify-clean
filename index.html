@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Clean</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@200;300;400&display=swap');
+
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+–bg: #0a0a0a;
+–fg: #f0ece4;
+–dim: rgba(240,236,228,0.35);
+–dimmer: rgba(240,236,228,0.12);
+}
+
+html, body {
+height: 100%;
+background: var(–bg);
+color: var(–fg);
+font-family: ‘DM Sans’, sans-serif;
+overflow: hidden;
+touch-action: manipulation;
+}
+
+/* ── LOGIN SCREEN ── */
+#login-screen {
+height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 48px;
+padding: 40px;
+}
+
+.logo-mark {
+width: 56px;
+height: 56px;
+border: 1.5px solid var(–fg);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.logo-mark svg { width: 24px; height: 24px; fill: var(–fg); }
+
+.login-text {
+text-align: center;
+}
+
+.login-text h1 {
+font-family: ‘DM Mono’, monospace;
+font-weight: 300;
+font-size: 13px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–dim);
+margin-bottom: 12px;
+}
+
+.login-text p {
+font-weight: 200;
+font-size: 15px;
+color: var(–dim);
+line-height: 1.6;
+}
+
+#login-btn {
+background: none;
+border: 1px solid rgba(240,236,228,0.3);
+color: var(–fg);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+padding: 16px 40px;
+cursor: pointer;
+border-radius: 2px;
+transition: border-color 0.3s, background 0.3s;
+}
+
+#login-btn:active { background: rgba(240,236,228,0.08); }
+
+/* ── PLAYER SCREEN ── */
+#player-screen {
+height: 100vh;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: space-between;
+padding: 60px 32px 52px;
+position: relative;
+}
+
+/* ambient glow behind art */
+#ambient {
+position: absolute;
+width: 280px;
+height: 280px;
+border-radius: 50%;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -60%);
+filter: blur(80px);
+opacity: 0.18;
+transition: background 2s ease;
+pointer-events: none;
+z-index: 0;
+}
+
+/* top: track info */
+#track-info {
+text-align: center;
+z-index: 1;
+width: 100%;
+}
+
+#track-name {
+font-weight: 300;
+font-size: 20px;
+letter-spacing: -0.01em;
+color: var(–fg);
+margin-bottom: 6px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+#artist-name {
+font-family: ‘DM Mono’, monospace;
+font-weight: 300;
+font-size: 11px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–dim);
+}
+
+/* middle: album art */
+#art-zone {
+z-index: 1;
+position: relative;
+width: 100%;
+display: flex;
+justify-content: center;
+}
+
+#art-container {
+position: relative;
+width: min(72vw, 300px);
+height: min(72vw, 300px);
+user-select: none;
+}
+
+#album-art {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 4px;
+display: block;
+transition: transform 0.15s ease, opacity 0.4s ease;
+box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+#album-art.paused {
+transform: scale(0.94);
+opacity: 0.7;
+}
+
+/* tap zones — invisible overlays */
+#tap-left, #tap-right, #tap-center {
+position: absolute;
+top: 0;
+height: 100%;
+z-index: 2;
+}
+
+#tap-left  { left: 0;   width: 28%; }
+#tap-right { right: 0;  width: 28%; }
+#tap-center { left: 28%; width: 44%; }
+
+/* tap flash feedback */
+.tap-flash {
+position: absolute;
+top: 0; left: 0;
+width: 100%; height: 100%;
+background: rgba(255,255,255,0.08);
+border-radius: 4px;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.1s;
+}
+
+.tap-flash.show { opacity: 1; }
+
+/* skip arrows — appear briefly on double tap */
+#skip-indicator {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+width: 100%;
+display: flex;
+justify-content: space-between;
+padding: 0 8px;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.15s;
+z-index: 3;
+}
+
+#skip-indicator.show { opacity: 1; }
+
+.skip-arrow {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.15em;
+color: var(–fg);
+background: rgba(10,10,10,0.7);
+padding: 6px 10px;
+border-radius: 2px;
+}
+
+/* bottom: progress */
+#progress-zone {
+z-index: 1;
+width: 100%;
+}
+
+#progress-bar-bg {
+width: 100%;
+height: 1.5px;
+background: var(–dimmer);
+border-radius: 1px;
+margin-bottom: 14px;
+position: relative;
+overflow: hidden;
+}
+
+#progress-bar-fill {
+height: 100%;
+background: var(–fg);
+border-radius: 1px;
+width: 0%;
+transition: width 1s linear;
+}
+
+#time-row {
+display: flex;
+justify-content: space-between;
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.1em;
+color: var(–dim);
+}
+
+/* loading / error states */
+#status {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.15em;
+color: var(–dim);
+white-space: nowrap;
+z-index: 10;
+}
+
+/* nothing playing state */
+#nothing-playing {
+display: none;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+z-index: 1;
+}
+
+#nothing-playing p {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–dim);
+}
+
+.pulse-ring {
+width: 80px;
+height: 80px;
+border: 1px solid var(–dimmer);
+border-radius: 50%;
+animation: pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+0%, 100% { transform: scale(1); opacity: 0.3; }
+50% { transform: scale(1.08); opacity: 0.6; }
+}
+</style>
+
+</head>
+<body>
+
+<!-- LOGIN -->
+
+<div id="login-screen">
+  <div class="logo-mark">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.586 14.424a.623.623 0 01-.857.208c-2.348-1.435-5.304-1.76-8.785-.964a.623.623 0 11-.277-1.215c3.809-.87 7.076-.496 9.712 1.114a.623.623 0 01.207.857zm1.223-2.722a.78.78 0 01-1.072.257c-2.687-1.652-6.785-2.13-9.965-1.166a.78.78 0 01-.973-.519.781.781 0 01.519-.972c3.633-1.102 8.147-.568 11.234 1.328a.78.78 0 01.257 1.072zm.105-2.835C14.692 8.95 9.375 8.775 6.297 9.71a.937.937 0 11-.543-1.793c3.563-1.081 9.484-.872 13.22 1.37a.937.937 0 01-.06 1.58z"/>
+    </svg>
+  </div>
+  <div class="login-text">
+    <h1>Clean</h1>
+    <p>A minimal interface<br>for your music.</p>
+  </div>
+  <button id="login-btn">Connect Spotify</button>
+</div>
+
+<!-- PLAYER -->
+
+<div id="player-screen">
+  <div id="ambient"></div>
+
+  <div id="track-info">
+    <div id="track-name">—</div>
+    <div id="artist-name">—</div>
+  </div>
+
+  <div id="art-zone">
+    <div id="art-container">
+      <img id="album-art" src="" alt="">
+      <div class="tap-flash" id="flash"></div>
+      <div id="skip-indicator">
+        <span class="skip-arrow">← BACK</span>
+        <span class="skip-arrow">SKIP →</span>
+      </div>
+      <div id="tap-left"></div>
+      <div id="tap-center"></div>
+      <div id="tap-right"></div>
+    </div>
+
+```
+<div id="nothing-playing">
+  <div class="pulse-ring"></div>
+  <p>Nothing playing</p>
+</div>
+```
+
+  </div>
+
+  <div id="progress-zone">
+    <div id="progress-bar-bg">
+      <div id="progress-bar-fill"></div>
+    </div>
+    <div id="time-row">
+      <span id="time-current">0:00</span>
+      <span id="time-total">0:00</span>
+    </div>
+  </div>
+
+  <div id="status"></div>
+</div>
+
+<script>
+const CLIENT_ID = 'f90c7a5cbf8941d48774e68a03cf91a8';
+const REDIRECT_URI = 'https://halofromds.github.io/Spotify-clean/';
+const SCOPES = 'user-read-playback-state user-modify-playback-state user-read-currently-playing';
+
+let accessToken = null;
+let isPlaying = false;
+let pollInterval = null;
+let progressInterval = null;
+let currentMs = 0;
+let durationMs = 0;
+let lastPollTime = 0;
+
+// ── AUTH ──────────────────────────────────────────────
+function generateCodeVerifier(length = 128) {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  let result = '';
+  const arr = new Uint8Array(length);
+  crypto.getRandomValues(arr);
+  arr.forEach(b => result += chars[b % chars.length]);
+  return result;
+}
+
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+async function login() {
+  const verifier = generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  sessionStorage.setItem('pkce_verifier', verifier);
+
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    redirect_uri: REDIRECT_URI,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+  });
+
+  window.location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+
+async function exchangeCode(code) {
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: REDIRECT_URI,
+      client_id: CLIENT_ID,
+      code_verifier: verifier,
+    }),
+  });
+  const data = await res.json();
+  if (data.access_token) {
+    accessToken = data.access_token;
+    sessionStorage.setItem('spotify_token', accessToken);
+    sessionStorage.removeItem('pkce_verifier');
+    // clean URL
+    window.history.replaceState({}, '', window.location.pathname);
+    showPlayer();
+  } else {
+    setStatus('Auth failed — try again');
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  // Check for auth code in URL (redirect back from Spotify)
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+
+  if (code) {
+    setStatus('Connecting…');
+    await exchangeCode(code);
+    return;
+  }
+
+  // Check stored token
+  const stored = sessionStorage.getItem('spotify_token');
+  if (stored) {
+    accessToken = stored;
+    showPlayer();
+    return;
+  }
+
+  // Show login
+  document.getElementById('login-screen').style.display = 'flex';
+});
+
+document.getElementById('login-btn').addEventListener('click', login);
+
+// ── PLAYER ────────────────────────────────────────────
+function showPlayer() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('player-screen').style.display = 'flex';
+  startPolling();
+}
+
+function setStatus(msg) {
+  document.getElementById('status').textContent = msg;
+}
+
+async function fetchPlayback() {
+  if (!accessToken) return;
+  try {
+    const res = await fetch('https://api.spotify.com/v1/me/player', {
+      headers: { Authorization: 'Bearer ' + accessToken }
+    });
+
+    if (res.status === 401) {
+      accessToken = null;
+      sessionStorage.removeItem('spotify_token');
+      location.reload();
+      return;
+    }
+
+    if (res.status === 204 || !res.ok) {
+      showNothingPlaying();
+      return;
+    }
+
+    const data = await res.json();
+    if (!data || !data.item) { showNothingPlaying(); return; }
+
+    updateUI(data);
+    setStatus('');
+  } catch (e) {
+    setStatus('Connection error');
+  }
+}
+
+function updateUI(data) {
+  const track = data.item;
+  isPlaying = data.is_playing;
+  currentMs = data.progress_ms;
+  durationMs = track.duration_ms;
+  lastPollTime = Date.now();
+
+  // track info
+  document.getElementById('track-name').textContent = track.name;
+  document.getElementById('artist-name').textContent = track.artists.map(a => a.name).join(', ');
+
+  // album art
+  const artEl = document.getElementById('album-art');
+  const imgUrl = track.album.images[0]?.url || '';
+  if (artEl.src !== imgUrl && imgUrl) {
+    artEl.src = imgUrl;
+    // extract dominant color for ambient (rough average — just use a warm glow)
+    document.getElementById('ambient').style.background = `radial-gradient(circle, rgba(180,140,100,1), transparent)`;
+  }
+
+  artEl.classList.toggle('paused', !isPlaying);
+
+  // show/hide art vs nothing playing
+  document.getElementById('art-container').style.display = 'block';
+  document.getElementById('nothing-playing').style.display = 'none';
+
+  // progress
+  updateProgress();
+  clearInterval(progressInterval);
+  if (isPlaying) {
+    progressInterval = setInterval(() => {
+      currentMs += 1000;
+      if (currentMs > durationMs) currentMs = durationMs;
+      updateProgress();
+    }, 1000);
+  }
+}
+
+function updateProgress() {
+  const pct = durationMs > 0 ? (currentMs / durationMs) * 100 : 0;
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+  document.getElementById('time-current').textContent = msToTime(currentMs);
+  document.getElementById('time-total').textContent = msToTime(durationMs);
+}
+
+function msToTime(ms) {
+  const s = Math.floor(ms / 1000);
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function showNothingPlaying() {
+  document.getElementById('art-container').style.display = 'none';
+  document.getElementById('nothing-playing').style.display = 'flex';
+  document.getElementById('track-name').textContent = '—';
+  document.getElementById('artist-name').textContent = '—';
+  clearInterval(progressInterval);
+}
+
+function startPolling() {
+  fetchPlayback();
+  pollInterval = setInterval(fetchPlayback, 5000);
+}
+
+// ── CONTROLS ──────────────────────────────────────────
+async function spotifyCommand(endpoint, method = 'POST') {
+  if (!accessToken) return;
+  await fetch('https://api.spotify.com/v1/me/player/' + endpoint, {
+    method,
+    headers: { Authorization: 'Bearer ' + accessToken }
+  });
+  setTimeout(fetchPlayback, 400);
+}
+
+async function togglePlayPause() {
+  if (isPlaying) {
+    await spotifyCommand('pause', 'PUT');
+  } else {
+    await spotifyCommand('play', 'PUT');
+  }
+  isPlaying = !isPlaying;
+  document.getElementById('album-art').classList.toggle('paused', !isPlaying);
+  if (isPlaying) {
+    clearInterval(progressInterval);
+    progressInterval = setInterval(() => {
+      currentMs += 1000;
+      updateProgress();
+    }, 1000);
+  } else {
+    clearInterval(progressInterval);
+  }
+}
+
+async function skipNext() { await spotifyCommand('next'); }
+async function skipPrev() { await spotifyCommand('previous'); }
+
+// ── TAP HANDLING ──────────────────────────────────────
+let tapTimers = { left: null, right: null };
+let tapCounts = { left: 0, right: 0 };
+
+function flashFeedback(show = true) {
+  const f = document.getElementById('flash');
+  f.classList.toggle('show', show);
+  if (show) setTimeout(() => f.classList.remove('show'), 120);
+}
+
+function showSkipIndicator(dir) {
+  const ind = document.getElementById('skip-indicator');
+  ind.classList.add('show');
+  setTimeout(() => ind.classList.remove('show'), 500);
+}
+
+// Center tap → play/pause
+document.getElementById('tap-center').addEventListener('click', () => {
+  flashFeedback(true);
+  togglePlayPause();
+});
+
+// Left double-tap → previous
+document.getElementById('tap-left').addEventListener('click', () => {
+  tapCounts.left++;
+  if (tapCounts.left === 1) {
+    tapTimers.left = setTimeout(() => { tapCounts.left = 0; }, 300);
+  } else if (tapCounts.left === 2) {
+    clearTimeout(tapTimers.left);
+    tapCounts.left = 0;
+    showSkipIndicator('left');
+    skipPrev();
+  }
+});
+
+// Right double-tap → next
+document.getElementById('tap-right').addEventListener('click', () => {
+  tapCounts.right++;
+  if (tapCounts.right === 1) {
+    tapTimers.right = setTimeout(() => { tapCounts.right = 0; }, 300);
+  } else if (tapCounts.right === 2) {
+    clearTimeout(tapTimers.right);
+    tapCounts.right = 0;
+    showSkipIndicator('right');
+    skipNext();
+  }
+});
+</script>
+
+</body>
+</html>
