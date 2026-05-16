@@ -1,310 +1,314 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Clean</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💿</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400&family=DM+Sans:wght@200;300;400&display=swap');
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-  :root {
-    --bg: #0a0a0a;
-    --fg: #f0ece4;
-    --dim: rgba(240,236,228,0.35);
-    --dimmer: rgba(240,236,228,0.12);
-  }
+:root {
+–bg: #0a0a0a;
+–fg: #f0ece4;
+–dim: rgba(240,236,228,0.35);
+–dimmer: rgba(240,236,228,0.12);
+}
 
-  html, body {
-    height: 100%;
-    background: var(--bg);
-    color: var(--fg);
-    font-family: 'DM Sans', sans-serif;
-    overflow: hidden;
-    touch-action: manipulation;
-  }
+html, body {
+height: 100%;
+background: var(–bg);
+color: var(–fg);
+font-family: ‘DM Sans’, sans-serif;
+overflow: hidden;
+touch-action: manipulation;
+}
 
-  /* ── LOGIN SCREEN ── */
-  #login-screen {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 48px;
-    padding: 40px;
-  }
+/* ── LOGIN SCREEN ── */
+#login-screen {
+height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+gap: 48px;
+padding: 40px;
+}
 
-  .logo-mark {
-    width: 56px;
-    height: 56px;
-    border: 1.5px solid var(--fg);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.logo-mark {
+width: 56px;
+height: 56px;
+border: 1.5px solid var(–fg);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
 
-  .logo-mark svg { width: 24px; height: 24px; fill: var(--fg); }
+.logo-mark svg { width: 24px; height: 24px; fill: var(–fg); }
 
-  .login-text {
-    text-align: center;
-  }
+.login-text {
+text-align: center;
+}
 
-  .login-text h1 {
-    font-family: 'DM Mono', monospace;
-    font-weight: 300;
-    font-size: 13px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 12px;
-  }
+.login-text h1 {
+font-family: ‘DM Mono’, monospace;
+font-weight: 300;
+font-size: 13px;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–dim);
+margin-bottom: 12px;
+}
 
-  .login-text p {
-    font-weight: 200;
-    font-size: 15px;
-    color: var(--dim);
-    line-height: 1.6;
-  }
+.login-text p {
+font-weight: 200;
+font-size: 15px;
+color: var(–dim);
+line-height: 1.6;
+}
 
-  #login-btn {
-    background: none;
-    border: 1px solid rgba(240,236,228,0.3);
-    color: var(--fg);
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    padding: 16px 40px;
-    cursor: pointer;
-    border-radius: 2px;
-    transition: border-color 0.3s, background 0.3s;
-  }
+#login-btn {
+background: none;
+border: 1px solid rgba(240,236,228,0.3);
+color: var(–fg);
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+padding: 16px 40px;
+cursor: pointer;
+border-radius: 2px;
+transition: border-color 0.3s, background 0.3s;
+}
 
-  #login-btn:active { background: rgba(240,236,228,0.08); }
+#login-btn:active { background: rgba(240,236,228,0.08); }
 
-  /* ── PLAYER SCREEN ── */
-  #player-screen {
-    height: 100vh;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 60px 32px 52px;
-    position: relative;
-  }
+/* ── PLAYER SCREEN ── */
+#player-screen {
+height: 100vh;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: space-between;
+padding: 60px 32px 52px;
+position: relative;
+}
 
-  /* ambient glow behind art */
-  #ambient {
-    position: absolute;
-    width: 280px;
-    height: 280px;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -60%);
-    filter: blur(80px);
-    opacity: 0.18;
-    transition: background 2s ease;
-    pointer-events: none;
-    z-index: 0;
-  }
+/* ambient glow behind art */
+#ambient {
+position: absolute;
+width: 280px;
+height: 280px;
+border-radius: 50%;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -60%);
+filter: blur(80px);
+opacity: 0.18;
+transition: background 2s ease;
+pointer-events: none;
+z-index: 0;
+}
 
-  /* top: track info */
-  #track-info {
-    text-align: center;
-    z-index: 1;
-    width: 100%;
-  }
+/* top: track info */
+#track-info {
+text-align: center;
+z-index: 1;
+width: 100%;
+}
 
-  #track-name {
-    font-weight: 300;
-    font-size: 20px;
-    letter-spacing: -0.01em;
-    color: var(--fg);
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+#track-name {
+font-weight: 300;
+font-size: 20px;
+letter-spacing: -0.01em;
+color: var(–fg);
+margin-bottom: 6px;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
 
-  #artist-name {
-    font-family: 'DM Mono', monospace;
-    font-weight: 300;
-    font-size: 11px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--dim);
-  }
+#artist-name {
+font-family: ‘DM Mono’, monospace;
+font-weight: 300;
+font-size: 11px;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–dim);
+}
 
-  /* middle: album art */
-  #art-zone {
-    z-index: 1;
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-  }
+/* middle: album art */
+#art-zone {
+z-index: 1;
+position: relative;
+width: 100%;
+display: flex;
+justify-content: center;
+}
 
-  #art-container {
-    position: relative;
-    width: min(72vw, 300px);
-    height: min(72vw, 300px);
-    user-select: none;
-  }
+#art-container {
+position: relative;
+width: min(72vw, 300px);
+height: min(72vw, 300px);
+user-select: none;
+}
 
-  #album-art {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 4px;
-    display: block;
-    transition: transform 0.15s ease, opacity 0.4s ease;
-    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
-  }
+#album-art {
+width: 100%;
+height: 100%;
+object-fit: cover;
+border-radius: 4px;
+display: block;
+transition: transform 0.15s ease, opacity 0.4s ease;
+box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
 
-  #album-art.paused {
-    transform: scale(0.94);
-    opacity: 0.7;
-  }
+#album-art.paused {
+transform: scale(0.94);
+opacity: 0.7;
+}
 
-  /* tap zones — invisible overlays */
-  #tap-left, #tap-right, #tap-center {
-    position: absolute;
-    top: 0;
-    height: 100%;
-    z-index: 2;
-  }
+/* tap zones — invisible overlays */
+#tap-left, #tap-right, #tap-center {
+position: absolute;
+top: 0;
+height: 100%;
+z-index: 2;
+}
 
-  #tap-left  { left: 0;   width: 28%; }
-  #tap-right { right: 0;  width: 28%; }
-  #tap-center { left: 28%; width: 44%; }
+#tap-left  { left: 0;   width: 28%; }
+#tap-right { right: 0;  width: 28%; }
+#tap-center { left: 28%; width: 44%; }
 
-  /* tap flash feedback */
-  .tap-flash {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(255,255,255,0.08);
-    border-radius: 4px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.1s;
-  }
+/* tap flash feedback */
+.tap-flash {
+position: absolute;
+top: 0; left: 0;
+width: 100%; height: 100%;
+background: rgba(255,255,255,0.08);
+border-radius: 4px;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.1s;
+}
 
-  .tap-flash.show { opacity: 1; }
+.tap-flash.show { opacity: 1; }
 
-  /* skip arrows — appear briefly on double tap */
-  #skip-indicator {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    padding: 0 8px;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.15s;
-    z-index: 3;
-  }
+/* skip arrows — appear briefly on double tap */
+#skip-indicator {
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+width: 100%;
+display: flex;
+justify-content: space-between;
+padding: 0 8px;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.15s;
+z-index: 3;
+}
 
-  #skip-indicator.show { opacity: 1; }
-  #skip-indicator:not(.show) { display: none; }
+#skip-indicator.show { opacity: 1; }
+#skip-indicator:not(.show) { display: none; }
 
-  .skip-arrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--fg);
-    background: rgba(10,10,10,0.7);
-    padding: 6px 10px;
-    border-radius: 2px;
-  }
+.skip-arrow {
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.15em;
+color: var(–fg);
+background: rgba(10,10,10,0.7);
+padding: 6px 10px;
+border-radius: 2px;
+}
 
-  /* bottom: progress */
-  #progress-zone {
-    z-index: 1;
-    width: 100%;
-  }
+/* bottom: progress */
+#progress-zone {
+z-index: 1;
+width: 100%;
+}
 
-  #progress-bar-bg {
-    width: 100%;
-    height: 1.5px;
-    background: var(--dimmer);
-    border-radius: 1px;
-    margin-bottom: 14px;
-    position: relative;
-    overflow: hidden;
-  }
+#progress-bar-bg {
+width: 100%;
+height: 1.5px;
+background: var(–dimmer);
+border-radius: 1px;
+margin-bottom: 14px;
+position: relative;
+overflow: hidden;
+}
 
-  #progress-bar-fill {
-    height: 100%;
-    background: var(--fg);
-    border-radius: 1px;
-    width: 0%;
-    transition: width 1s linear;
-  }
+#progress-bar-fill {
+height: 100%;
+background: var(–fg);
+border-radius: 1px;
+width: 0%;
+transition: width 1s linear;
+}
 
-  #time-row {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    color: var(--dim);
-  }
+#time-row {
+display: flex;
+justify-content: space-between;
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.1em;
+color: var(–dim);
+}
 
-  /* loading / error states */
-  #status {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    color: var(--dim);
-    white-space: nowrap;
-    z-index: 10;
-  }
+/* loading / error states */
+#status {
+position: absolute;
+bottom: 20px;
+left: 50%;
+transform: translateX(-50%);
+font-family: ‘DM Mono’, monospace;
+font-size: 10px;
+letter-spacing: 0.15em;
+color: var(–dim);
+white-space: nowrap;
+z-index: 10;
+}
 
-  /* nothing playing state */
-  #nothing-playing {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-    z-index: 1;
-  }
+/* nothing playing state */
+#nothing-playing {
+display: none;
+flex-direction: column;
+align-items: center;
+gap: 16px;
+z-index: 1;
+}
 
-  #nothing-playing p {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--dim);
-  }
+#nothing-playing p {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–dim);
+}
 
-  .pulse-ring {
-    width: 80px;
-    height: 80px;
-    border: 1px solid var(--dimmer);
-    border-radius: 50%;
-    animation: pulse 2.5s ease-in-out infinite;
-  }
+.pulse-ring {
+width: 80px;
+height: 80px;
+border: 1px solid var(–dimmer);
+border-radius: 50%;
+animation: pulse 2.5s ease-in-out infinite;
+}
 
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.3; }
-    50% { transform: scale(1.08); opacity: 0.6; }
-  }
+@keyframes pulse {
+0%, 100% { transform: scale(1); opacity: 0.3; }
+50% { transform: scale(1.08); opacity: 0.6; }
+}
 </style>
+
 </head>
 <body>
 
 <!-- LOGIN -->
+
 <div id="login-screen">
   <div class="logo-mark">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -319,6 +323,7 @@
 </div>
 
 <!-- PLAYER -->
+
 <div id="player-screen">
   <div id="ambient"></div>
 
@@ -340,10 +345,13 @@
       <div id="tap-right"></div>
     </div>
 
-    <div id="nothing-playing">
-      <div class="pulse-ring"></div>
-      <p>Nothing playing</p>
-    </div>
+```
+<div id="nothing-playing">
+  <div class="pulse-ring"></div>
+  <p>Nothing playing</p>
+</div>
+```
+
   </div>
 
   <div id="progress-zone">
@@ -643,5 +651,6 @@ document.getElementById('tap-right').addEventListener('click', () => {
   }
 });
 </script>
+
 </body>
 </html>
